@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel"
+    modelDirectory="/GuiaApe5/src-gen" creationIcons="false" editDirectory="/GuiaApe5.edit/src-gen"
+    editorDirectory="/GuiaApe5.editor/src-gen" modelPluginID="GuiaApe5" modelName="GuiaApe5"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" codeFormatting="true"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="21.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>guiaApe5.ecore</foreignModel>
+  <testsDirectory xsi:nil="true"/>
+  <genPackages prefix="GuiaApe5" disposableProviderFactory="true" ecorePackage="guiaApe5.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="guiaApe5.ecore#//TipoDato">
+      <genEnumLiterals ecoreEnumLiteral="guiaApe5.ecore#//TipoDato/String"/>
+      <genEnumLiterals ecoreEnumLiteral="guiaApe5.ecore#//TipoDato/int"/>
+      <genEnumLiterals ecoreEnumLiteral="guiaApe5.ecore#//TipoDato/boolean"/>
+      <genEnumLiterals ecoreEnumLiteral="guiaApe5.ecore#//TipoDato/double"/>
+    </genEnums>
+    <genClasses ecoreClass="guiaApe5.ecore#//Contenedor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Contenedor/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference guiaApe5.ecore#//Contenedor/posee"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference guiaApe5.ecore#//Contenedor/relaciona"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Contenedor/main"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Contenedor/esVisual"/>
+    </genClasses>
+    <genClasses ecoreClass="guiaApe5.ecore#//Sistema">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Sistema/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference guiaApe5.ecore#//Sistema/contiene"/>
+    </genClasses>
+    <genClasses ecoreClass="guiaApe5.ecore#//Elemento">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Elemento/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Elemento/isPrimary"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Elemento/longitud"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Elemento/tipoDato"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute guiaApe5.ecore#//Elemento/esObligatorio"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

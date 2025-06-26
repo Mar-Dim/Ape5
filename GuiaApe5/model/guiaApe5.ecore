@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="guiaApe5" nsURI="http://www.example.org/guiaApe5" nsPrefix="guiaApe5">
+  <eClassifiers xsi:type="ecore:EClass" name="Contenedor">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="posee" lowerBound="1" upperBound="-1"
+        eType="#//Elemento" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relaciona" upperBound="-1"
+        eType="#//Contenedor"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="main" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esVisual" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sistema">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contiene" upperBound="-1"
+        eType="#//Contenedor" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Elemento">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isPrimary" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="longitud" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoDato" eType="#//TipoDato"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esObligatorio" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoDato">
+    <eLiterals name="String"/>
+    <eLiterals name="int" value="1"/>
+    <eLiterals name="boolean" value="2"/>
+    <eLiterals name="double" value="3"/>
+  </eClassifiers>
+</ecore:EPackage>
