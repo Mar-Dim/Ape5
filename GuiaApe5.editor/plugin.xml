@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated guiaApe5 -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="guiaApe5.presentation.GuiaApe5ModelWizardID"
+            name="%_UI_GuiaApe5ModelWizard_label"
+            class="guiaApe5.presentation.GuiaApe5ModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/GuiaApe5ModelFile.gif">
+         <description>%_UI_GuiaApe5ModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated guiaApe5 -->
+      <editor
+            id="guiaApe5.presentation.GuiaApe5EditorID"
+            name="%_UI_GuiaApe5Editor_label"
+            icon="icons/full/obj16/GuiaApe5ModelFile.gif"
+            extensions="guiaape5"
+            class="guiaApe5.presentation.GuiaApe5Editor"
+            contributorClass="guiaApe5.presentation.GuiaApe5ActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>
