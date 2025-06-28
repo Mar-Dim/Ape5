@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: editor.GuiaApe5
+Bundle-ManifestVersion: 2
+Bundle-Name: editor.GuiaApe5
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: editor.GuiaApe5; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: GuiaApe5,
+ org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.19.0",
+ org.eclipse.xtext.xbase.lib;bundle-version="2.38.0",
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Export-Package: guiaApe5,
+ guiaApe5.services,
+ guiaApe5.generator,
+ guiaApe5.parser.antlr.internal,
+ guiaApe5.formatting2,
+ guiaApe5.validation,
+ guiaApe5.parser.antlr,
+ guiaApe5.scoping,
+ guiaApe5.serializer
+Import-Package: org.apache.log4j
