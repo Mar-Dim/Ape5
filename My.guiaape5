@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guiaApe5:Sistema xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:guiaApe5="http://www.example.org/guiaApe5" name="sistema">
+  <contiene name="c1">
+    <posee name="id" isPrimary="true" tipoDato="int"/>
+  </contiene>
+  <contiene name="c2" relaciona="//@contiene.0" main="true">
+    <posee name="id" isPrimary="true" tipoDato="int" esObligatorio="true"/>
+    <posee name="nombre" longitud="20" esObligatorio="true"/>
+  </contiene>
+  <contiene name="principal" main="true" esVisual="true">
+    <posee name="input" longitud="20"/>
+  </contiene>
+</guiaApe5:Sistema>
