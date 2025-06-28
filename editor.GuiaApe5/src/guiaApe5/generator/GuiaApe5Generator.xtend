@@ -7,19 +7,487 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import guiaApe5.Sistema
+import guiaApe5.TipoDato
+import guiaApe5.Contenedor
 
-/**
- * Generates code from your model files on save.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
- */
+
 class GuiaApe5Generator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+	for(s :resource.allContents.toIterable.filter(Sistema)){
+			fsa.generateFile("frontend/App.jsx", generateAppReact(s))
+			fsa.generateFile("frontend/main.jsx",generateMain(s))
+			fsa.generateFile("frontend/index.html",generateHTML(s))
+			fsa.generateFile("frontend/vite.config.js",generateViteConfig(s))
+			fsa.generateFile("frontend/package.json", generatePackageJsonFrontend)
+			fsa.generateFile(s.name+".sql",genSQL(s))
+			fsa.generateFile("backend/main.ts", generateMainNest)
+			fsa.generateFile("backend/app.module.ts", generateAppModule(s))
+			fsa.generateFile("backend/package.json", generatePackageJsonNest)
+			fsa.generateFile("backend/tsconfig.json", generateTsConfigBackend)
+			
+			for (c:s.contiene){
+				if(!c.esVisual){
+				fsa.generateFile("backend/entities/"+c.name+".entity.ts",getEntity(c))
+				fsa.generateFile("backend/controllers/"+c.name+".controller.ts",getController(c))
+				fsa.generateFile("backend/modules/"+c.name+".module.ts",getModule(c))
+				fsa.generateFile("backend/modules/"+c.name+".service.ts",getService(c))
+				}
+				else{
+					fsa.generateFile("frontend/components/"+c.name+".jsx",generateReact(c))
+					fsa.generateFile("frontend/"+c.name+".css",generateCSS(c))
+				}
+			}
+		}
 	}
+	
+
+
+	
+	def genSQL(Sistema s) {
+  '''
+  CREATE DATABASE «s.name»;
+  USE «s.name»;
+
+
+  «FOR cont : s.contiene»
+
+  CREATE TABLE «cont.name» (
+    «FOR elem : cont.posee»
+      «elem.name» «getTipoSQL(elem.tipoDato)»«IF elem.isPrimary» PRIMARY KEY«ENDIF»,
+    «ENDFOR»
+    «IF !cont.relaciona.empty»
+      «FOR rel : cont.relaciona»
+        FOREIGN KEY (id_«rel.name») REFERENCES «rel.name»(id),
+      «ENDFOR»
+    «ENDIF»
+
+
+  «ENDFOR»
+  '''
 }
+	
+def getTipoSQL(TipoDato tipo) {
+	  if (tipo === null) return 'TEXT'
+	
+	  switch tipo.literal {
+	    case 'String': 'VARCHAR(255)'
+	    case 'int': 'INT'
+	    case 'boolean': 'BOOLEAN'
+	    case 'double': 'DOUBLE'
+	    default: 'TEXT'
+	  }
+}
+
+def generateAppReact(Sistema s) {
+  '''
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  «FOR c : s.contiene.filter[esVisual]»
+  import «c.name.toFirstUpper»Form from './components«c.name».jsx';
+  import './«c.name».css';
+  «ENDFOR»
+
+  function App() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '2rem' }}>
+        «FOR c : s.contiene.filter[esVisual]»
+        <section>
+          <«c.name.toFirstUpper»Form />
+        </section>
+        «ENDFOR»
+      </div>
+    );
+  }
+
+  export default App;
+  '''
+}
+
+def generateMain(Sistema s){
+	'''
+	import React from 'react';
+	import ReactDOM from 'react-dom/client';
+	import App from './App.jsx';
+	
+	const root = ReactDOM.createRoot(document.getElementById('root'));
+	root.render(<App />);
+
+	'''
+}
+
+def generateHTML(Sistema s){
+	'''
+  <!DOCTYPE html>
+  <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>«s.name»</title>
+    </head>
+    <body>
+      <div id="root"></div>
+      <script type="module" src="/main.jsx"></script>
+    </body>
+  </html>
+  '''
+}
+
+def generateViteConfig(Sistema s){
+  '''
+  import { defineConfig } from 'vite';
+  import react from '@vitejs/plugin-react';
+
+  // https://vitejs.dev/config/
+  export default defineConfig({
+    plugins: [react()],
+    server: {
+      port: 5173,
+      open: true
+    },
+    build: {
+      outDir: 'dist',
+      sourcemap: true
+    }
+  });
+  '''
+}
+def generatePackageJsonFrontend() {
+  '''
+  {
+    "name": "metamodel-frontend",
+    "version": "1.0.0",
+    "description": "Frontend generado automáticamente por el metamodelo ✨",
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",
+      "preview": "vite preview"
+    },
+    "dependencies": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+      "@vitejs/plugin-react": "^4.0.0",
+      "vite": "^5.0.0"
+    }
+  }
+  '''
+}
+
+
+def generatePackageJsonNest() {
+'''
+{
+  "name": "metamodel-backend",
+  "version": "1.0.0",
+  "description": "Backend generado automáticamente por metamodelo Xtend 😎",
+  "main": "main.ts",
+  "scripts": {
+    "start": "ts-node main.ts",
+    "start:dev": "ts-node-dev --respawn main.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.0.0",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.12"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.4"
+  }
+}
+'''
+}
+
+def generateTsConfigBackend() {
+  '''
+  {
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es2017",
+      "strict": true,
+      "esModuleInterop": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "skipLibCheck": true
+    }
+  }
+  '''
+}
+
+
+def generateMainNest(){
+	'''
+  import { NestFactory } from '@nestjs/core';
+  import { AppModule } from './app.module';
+
+  async function bootstrap() {
+    const app = await NestFactory.create(AppModule);
+    await app.listen(3000);
+  }
+
+  bootstrap();
+  '''
+}
+
+def generateAppModule(Sistema s) {
+'''
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'db.sqlite',
+      entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
+    «FOR c : s.contiene.filter[!esVisual] SEPARATOR ','»
+    require('./modules/«c.name».module').«c.name.toFirstUpper»Module
+    «ENDFOR»
+  ],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
+'''
+}
+
+def getEntity(Contenedor c) {
+'''
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class «c.name.toFirstUpper» {
+  «FOR e : c.posee»
+    «IF e.isPrimary»
+    @PrimaryGeneratedColumn()
+    «e.name»!: «getTipoTS(e.tipoDato)»;
+    «ELSE»
+    @Column()
+    «e.name»!: «getTipoTS(e.tipoDato)»;
+    «ENDIF»
+  «ENDFOR»
+}
+'''
+}
+
+def getController(Contenedor contenedor) {
+  val className = contenedor.name.toFirstUpper
+  val fileName = contenedor.name.toLowerCase
+
+  '''
+import { Controller, Get, Post, Body } from '@nestjs/common';
+import { «className»Service } from '../modules/«fileName».service';
+import { «className» } from '../entities/«fileName».entity';
+
+@Controller('«fileName»')
+export class «className»Controller {
+  constructor(private readonly service: «className»Service) {}
+
+  @Post()
+  create(@Body() data: «className») {
+    return this.service.create(data);
+  }
+
+  @Get()
+  findAll() {
+    return this.service.findAll();
+  }
+}
+'''
+}
+
+def getService(Contenedor c){
+  val className = c.name.toFirstUpper
+  val fileName = c.name.toLowerCase
+
+  '''
+import { Injectable } from '@nestjs/common';
+import { «className» } from '../entities/«fileName».entity';
+
+@Injectable()
+export class «className»Service {
+
+  private data: «className»[] = [];
+
+  create(createData: «className») {
+    this.data.push(createData);
+    return createData;
+  }
+
+  findAll() {
+    return this.data;
+  }
+
+  findOne(id: number) {
+    return this.data.find(item => (item as any).id === id);
+  }
+
+  update(id: number, updateData: «className») {
+    const index = this.data.findIndex(item => (item as any).id === id);
+    if (index !== -1) {
+      this.data[index] = { ...this.data[index], ...updateData };
+      return this.data[index];
+    }
+    return null;
+  }
+
+  remove(id: number) {
+    this.data = this.data.filter(item => (item as any).id !== id);
+    return { deleted: true };
+  }
+}
+'''
+}
+
+def getModule(Contenedor c){
+  val className = c.name.toFirstUpper
+  val fileName = c.name.toLowerCase
+
+  '''
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { «className» } from '../entities/«fileName».entity';
+import { «className»Service } from './«fileName».service';
+import { «className»Controller } from '../controllers/«fileName».controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([«className»])],
+  providers: [«className»Service],
+  controllers: [«className»Controller],
+})
+export class «className»Module {}
+'''
+}
+
+
+def getTipoTS(TipoDato tipo) {
+	  if (tipo === null) return 'any'
+	
+	  switch tipo.literal {
+	    case 'String': 'string'
+	    case 'int': 'number'
+	    case 'boolean': 'boolean'
+	    case 'double': 'number'
+	    default: 'any'
+	  }
+}
+	
+	def generateReact(Contenedor c) {
+  val name = c.name.toFirstUpper
+  val fileName = c.name.toLowerCase
+
+  '''
+  import React, { useState } from 'react';
+  import './«fileName».css';
+
+  export default function «name»Form() {
+    const [formData, setFormData] = useState({
+      «FOR e : c.posee SEPARATOR ','»
+      «e.name»: ''
+      «ENDFOR»
+    });
+
+    const handleChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      console.log('Form submitted:', formData);
+    };
+
+    return (
+      <form className="form-«fileName»" onSubmit={handleSubmit}>
+        <h2>Formulario «name»</h2>
+        «FOR e : c.posee»
+        <div className="form-group">
+          <label htmlFor="«e.name»">«e.name.toFirstUpper»</label>
+          <input
+            type="text"
+            id="«e.name»"
+            name="«e.name»"
+            value={formData.«e.name»}
+            onChange={handleChange}
+            required={«e.esObligatorio.toString»}
+          />
+        </div>
+        «ENDFOR»
+
+        <button type="submit">Enviar</button>
+      </form>
+    );
+  }
+  '''
+}
+	
+def generateCSS(Contenedor c) {
+  val fileName = c.name.toLowerCase
+
+  '''
+  .form-«fileName» {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    padding: 1rem;
+    background-color: #fff0f5;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-«fileName» h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #ff69b4;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    background-color: #ff69b4;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  button:hover {
+    background-color: #ff1493;
+  }
+  '''
+}
+	
+
+}
+	
+
